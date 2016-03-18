@@ -426,6 +426,9 @@ static inline KEY_TYPE * exchange_keys(int const * restrict const send_offsets,
     const int target_pe = permute_array[i];
 #elif INCAST
     const int target_pe = i;
+#elif FANCY_SQUARE
+    const int target_pe = (my_rank+1)*(i+1)%(NUM_PES+1)-1;
+    if(target_pe < 0){printf("FANCY_SQUARE only works when (NUM_PES+1) is prime\n");shmem_global_exit(1);}
 #else
     const int target_pe = (my_rank + i) % NUM_PES;
 #endif
@@ -691,6 +694,8 @@ static void print_run_info(FILE * fp)
     fprintf(fp,"Randomized All2All\t");
 #elif INCAST
     fprintf(fp,"Incast All2All\t");
+#elif FANCY_SQUARE
+    fprintf(fp,"Fancy Latin Square All2All\t");
 #else
     fprintf(fp,"Round Robin All2All\t");
 #endif
